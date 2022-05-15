@@ -1,12 +1,6 @@
 import { isPromise } from "util/types";
 import type { TypePipe } from "../types/TypePipe";
-import type {
-	ExtendsNever,
-	IsAsync,
-	IsPromise,
-	IsPromiseOR,
-	Persist,
-} from "../types/types";
+import type { ExtendsNever, IsAsync, IsPromise, Persist } from "../types/types";
 
 export default class Match<
 	Value,
@@ -17,12 +11,7 @@ export default class Match<
 > implements TypePipe.Match<Value, Context, Global, Result, Async>
 {
 	private matchers: {
-		matcher: TypePipe.Function<
-			Value,
-			boolean | Promise<boolean>,
-			Context,
-			Global
-		>;
+		matcher: TypePipe.Function<Value, boolean, Context, Global>;
 		pipeline: TypePipe.Function<
 			Value,
 			ExtendsNever<Result, any, Result | Promise<Result>>,
@@ -38,11 +27,8 @@ export default class Match<
 		Global
 	>;
 
-	on<
-		Next extends ExtendsNever<Result, any, Result | Promise<Result>>,
-		Condition extends boolean | Promise<boolean>
-	>(
-		matcher: TypePipe.Function<Value, Condition, Context, Global>,
+	on<Next extends ExtendsNever<Result, any, Result | Promise<Result>>>(
+		matcher: TypePipe.Function<Value, boolean, Context, Global>,
 		pipeline: TypePipe.Function<Value, Next, Context, Global>
 	) {
 		this.matchers.push({ matcher, pipeline });
@@ -52,7 +38,7 @@ export default class Match<
 			Context,
 			Global,
 			ExtendsNever<Result, Awaited<Next>, Result>,
-			Persist<Async, IsPromiseOR<Next, Condition>>
+			Persist<Async, IsPromise<Next>>
 		>;
 	}
 
@@ -72,22 +58,10 @@ export default class Match<
 
 	run(value: Value, context: Context, global: Global): IsAsync<Result, Async> {
 		for (const { matcher, pipeline } of this.matchers) {
-			const condition = matcher(value, context, global) && pipeline;
+			const condition = matcher(value, context, global);
 
 			if (isPromise(condition)) {
-				return condition.then(c => {
-					if (!c) {
-						if (this.otherwisePipeline !== undefined) {
-							return this.otherwisePipeline(value, context, global);
-						}
-
-						throw new Error(
-							"Condition didn't match and no 'otherwise' pipeline was provided"
-						);
-					}
-
-					return pipeline(value, context, global);
-				}) as IsAsync<Result, Async>;
+				throw new Error("Condition can't be a promise");
 			}
 
 			if (condition) {

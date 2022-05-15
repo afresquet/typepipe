@@ -57,6 +57,22 @@ describe("Match class", () => {
 		expect(otherwise).toHaveBeenCalledWith(value, context, global);
 	});
 
+	test("throws an error if condition is a promise", () => {
+		const context = { run: 1 };
+		const global = { foo: "bar" };
+
+		const matcher = jest.fn(async (x, y) => y.run === 1);
+		const step = jest.fn(x => x * 2);
+
+		const match = new Match().on(matcher, step);
+
+		const fn = () => match.run(value, context, global);
+
+		expect(fn).toThrowError("Condition can't be a promise");
+		expect(matcher).toHaveBeenCalledWith(value, context, global);
+		expect(step).not.toHaveBeenCalled();
+	});
+
 	test("throws an error if no condition matches and no 'otherwise' function was provided", () => {
 		const context = { run: 2 };
 		const global = { foo: "bar" };

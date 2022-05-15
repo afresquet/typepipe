@@ -1,11 +1,5 @@
 export type IsPromise<T> = T extends PromiseLike<unknown> ? true : false;
 
-export type IsPromiseOR<T, U> = T extends PromiseLike<unknown>
-	? true
-	: U extends PromiseLike<unknown>
-	? true
-	: false;
-
 export type Persist<T, U> = T extends true ? T : U;
 
 export type IsAsync<T, U, B = false> = B extends true

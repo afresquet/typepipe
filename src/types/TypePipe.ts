@@ -1,10 +1,4 @@
-import {
-	ExtendsNever,
-	IsAsync,
-	IsPromise,
-	IsPromiseOR,
-	Persist,
-} from "./types";
+import { ExtendsNever, IsAsync, IsPromise, Persist } from "./types";
 
 export declare namespace TypePipe {
 	interface Function<Value, Result, Context, Global> {
@@ -28,18 +22,15 @@ export declare namespace TypePipe {
 	}
 
 	class Match<Value, Context, Global, Result = never, Async = false> {
-		on<
-			Next extends ExtendsNever<Result, any, Result | Promise<Result>>,
-			Condition extends boolean | Promise<boolean>
-		>(
-			matcher: (value: Value, context: Context, global: Global) => Condition,
+		on<Next extends ExtendsNever<Result, any, Result | Promise<Result>>>(
+			matcher: (value: Value, context: Context, global: Global) => boolean,
 			pipeline: TypePipe.Function<Value, Next, Context, Global>
 		): Match<
 			Value,
 			Context,
 			Global,
 			ExtendsNever<Result, Awaited<Next>, Result>,
-			Persist<Async, IsPromiseOR<Next, Condition>>
+			Persist<Async, IsPromise<Next>>
 		>;
 
 		otherwise<Next extends ExtendsNever<Result, any, Result | Promise<Result>>>(
