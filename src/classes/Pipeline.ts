@@ -2,8 +2,13 @@ import { isPromise } from "util/types";
 import type { TypePipe } from "../types/TypePipe";
 import type { IsAsync, IsPromise, Persist } from "../types/types";
 
-export default class Pipeline<Input, Current, Context, Global, Async = false>
-	implements TypePipe.Pipeline<Input, Current, Context, Global, Async>
+export default class Pipeline<
+	Current,
+	Context,
+	Global,
+	Input = Current,
+	Async = false
+> implements TypePipe.Pipeline<Current, Context, Global, Input, Async>
 {
 	private functions: TypePipe.Function<any, any, Context, Global>[] = [];
 
@@ -13,10 +18,10 @@ export default class Pipeline<Input, Current, Context, Global, Async = false>
 		this.functions.push(fn);
 
 		return this as unknown as Pipeline<
-			Input,
 			Awaited<Next>,
 			Context,
 			Global,
+			Input,
 			Persist<Async, IsAsync>
 		>;
 	}

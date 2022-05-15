@@ -5,10 +5,10 @@ export declare namespace TypePipe {
 		(value: Value, context: Context, global: Global): Result;
 	}
 
-	class Pipeline<Input, Current, Context, Global, Async = false> {
+	class Pipeline<Current, Context, Global, Input = Current, Async = false> {
 		pipe<Next, IsAsync = IsPromise<Next>>(
 			fn: TypePipe.Function<Current, Next, Context, Global>
-		): Pipeline<Input, Next, Context, Global, Persist<Async, IsAsync>>;
+		): Pipeline<Next, Context, Global, Input, Persist<Async, IsAsync>>;
 
 		compose(): TypePipe.Function<
 			Input,
