@@ -13,13 +13,8 @@ export function match<
 	matchFn: (
 		m: TypePipe.Match<Value, Context, Global, Expected>
 	) => TypePipe.Match<Value, Context, Global, Result, Async>
-) {
-	const builder = matchFn(new Match<Value, Context, Global, Expected>());
+): TypePipe.Function<Value, IsAsync<Result, Async, true>, Context, Global> {
+	const composition = matchFn(new Match<Value, Context, Global, Expected>());
 
-	return builder.run.bind(builder) as TypePipe.Function<
-		Value,
-		IsAsync<Result, Async, true>,
-		Context,
-		Global
-	>;
+	return composition.compose();
 }
