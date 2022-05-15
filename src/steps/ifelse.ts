@@ -1,24 +1,19 @@
 import { isPromise } from "util/types";
 import type { TypePipe } from "../types/TypePipe";
-import { IsAsync } from "../types/types";
+import { Infer } from "../types/types";
 
 export function ifelse<
 	Value,
 	Condition extends boolean | Promise<boolean>,
 	Then,
-	Otherwise extends Then extends PromiseLike<infer U>
-		? U | Promise<U>
-		: Then | Promise<Then>,
+	Otherwise extends Infer<Then>,
 	Context,
 	Global
 >(
 	condition: TypePipe.Function<Value, Condition, Context, Global>,
 	then: TypePipe.Function<Value, Then, Context, Global>,
-	otherwise: TypePipe.Function<Value, Otherwise, Context, Global> = value =>
-		value as any
+	otherwise: TypePipe.Function<Value, Otherwise, Context, Global>
 ) {
-	type Next = Then extends PromiseLike<unknown> ? Then : Otherwise;
-
 	return ((...args) => {
 		const result = condition(...args);
 
@@ -27,10 +22,5 @@ export function ifelse<
 		}
 
 		return result ? then(...args) : otherwise(...args);
-	}) as TypePipe.Function<
-		Value,
-		Next extends PromiseLike<unknown> ? Next : IsAsync<Next, Condition>,
-		Context,
-		Global
-	>;
+	}) as TypePipe.Function<Value, Awaited<Then>, Context, Global>;
 }

@@ -11,3 +11,7 @@ export type IsAsync<T, U, B = false> = B extends true
 	: T;
 
 export type ExtendsNever<T, U, V> = [T] extends [never] ? U : V;
+
+export type Infer<T> = T extends PromiseLike<infer U>
+	? U | Promise<U>
+	: T | Promise<T>;

@@ -33,16 +33,6 @@ describe("ifelse step", () => {
 		expect(otherwise).toHaveBeenCalledWith(value, context, global);
 	});
 
-	test("returns the same value if the condition is false and no 'otherwise' function is passed", () => {
-		const condition: TestFn<number, boolean> = jest.fn(x => x < 5);
-
-		const result = ifelse(condition, then)(value, context, global);
-
-		expect(result).toBe(value);
-		expect(condition).toHaveBeenCalledWith(value, context, global);
-		expect(then).not.toHaveBeenCalled();
-	});
-
 	test("works with promises for true condition", async () => {
 		const condition: TestFn<number, Promise<boolean>> = jest.fn(
 			async x => x > 5
