@@ -1,14 +1,14 @@
 import { isPromise } from "util/types";
-import type { Pipeline as TPipeline } from "./types/pipeline";
-import type { IsAsync, IsPromise, Persist } from "./types/types";
+import type { TypePipe } from "../types/TypePipe";
+import type { IsAsync, IsPromise, Persist } from "../types/types";
 
 export default class Pipeline<Input, Current, Context, Global, Async = false>
-	implements TPipeline.Pipeline<Input, Current, Context, Global, Async>
+	implements TypePipe.Pipeline<Input, Current, Context, Global, Async>
 {
-	functions: TPipeline.Fn<any, any, Context, Global>[] = [];
+	functions: TypePipe.Function<any, any, Context, Global>[] = [];
 
 	pipe<Next, IsAsync = IsPromise<Next>>(
-		fn: TPipeline.Fn<Current, Next, Context, Global>
+		fn: TypePipe.Function<Current, Next, Context, Global>
 	) {
 		this.functions.push(fn);
 
@@ -21,7 +21,7 @@ export default class Pipeline<Input, Current, Context, Global, Async = false>
 		>;
 	}
 
-	compose(): TPipeline.Fn<
+	compose(): TypePipe.Function<
 		Input,
 		IsAsync<Current, Async, true>,
 		Context,
@@ -37,7 +37,12 @@ export default class Pipeline<Input, Current, Context, Global, Async = false>
 
 				return fn2(res, context, global);
 			}
-		) as TPipeline.Fn<Input, IsAsync<Current, Async, true>, Context, Global>;
+		) as TypePipe.Function<
+			Input,
+			IsAsync<Current, Async, true>,
+			Context,
+			Global
+		>;
 
 		return (value, context, global) => composition(value, context, global);
 	}

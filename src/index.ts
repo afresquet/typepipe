@@ -1,9 +1,12 @@
-import Pipeline from "./Pipeline";
+// Classes
+import Pipeline from "./classes/Pipeline";
 export default Pipeline;
-
-export * from "./assert";
-export * from "./ifelse";
-export * from "./match";
-export * from "./pairwise";
-export * from "./tap";
-export type { Pipeline } from "./types/pipeline";
+export { default as Match } from "./classes/Match";
+// Steps
+export * from "./steps/assert";
+export * from "./steps/ifelse";
+export * from "./steps/match";
+export * from "./steps/pairwise";
+export * from "./steps/tap";
+// Types
+export type { TypePipe } from "./types/TypePipe";

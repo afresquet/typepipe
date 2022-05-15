@@ -1,9 +1,9 @@
 import { isPromise } from "util/types";
-import type { Pipeline } from "./types/pipeline";
-import { IsAsync } from "./types/types";
+import type { TypePipe } from "../types/TypePipe";
+import { IsAsync } from "../types/types";
 
 export function pairwise<Value, Next, Context, Global>(
-	fn: Pipeline.Fn<Value, Next, Context, Global>
+	fn: TypePipe.Function<Value, Next, Context, Global>
 ) {
 	return ((value: Value, context: Context, global: Global) => {
 		const result = fn(value, context, global);
@@ -13,5 +13,5 @@ export function pairwise<Value, Next, Context, Global>(
 		}
 
 		return [value, result];
-	}) as Pipeline.Fn<Value, IsAsync<[Value, Next], Next>, Context, Global>;
+	}) as TypePipe.Function<Value, IsAsync<[Value, Next], Next>, Context, Global>;
 }

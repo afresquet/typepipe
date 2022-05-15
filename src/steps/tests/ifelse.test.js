@@ -1,6 +1,6 @@
 const { ifelse } = require("../ifelse");
 
-describe("pipeline lib ifelse step", () => {
+describe("ifelse step", () => {
 	const value = 10;
 	const context = { foo: "bar" };
 	const global = { foo: "bar" };

@@ -1,6 +1,6 @@
 const { pairwise } = require("../pairwise");
 
-describe("pipeline lib pairwise step", () => {
+describe("pairwise step", () => {
 	const value = 10;
 	const context = { foo: "bar" };
 	const global = { bar: "foo" };

@@ -1,6 +1,6 @@
-const { match } = require("../match");
+const Match = require("../Match").default;
 
-describe("pipeline lib tap step", () => {
+describe("Match class", () => {
 	const value = 10;
 
 	test("executes pipeline if the condition matches", () => {
@@ -10,9 +10,9 @@ describe("pipeline lib tap step", () => {
 		const matcher = jest.fn((x, y) => y.run === 1);
 		const step = jest.fn(x => x * 2);
 
-		const fn = match(m => m.on(matcher, step));
+		const match = new Match().on(matcher, step);
 
-		const result = fn(value, context, global);
+		const result = match.run(value, context, global);
 
 		expect(result).toBe(20);
 		expect(matcher).toHaveBeenCalledWith(value, context, global);
@@ -28,9 +28,9 @@ describe("pipeline lib tap step", () => {
 		const matcher2 = jest.fn((x, y) => y.run === 2);
 		const step2 = jest.fn(x => x / 2);
 
-		const fn = match(m => m.on(matcher1, step1).on(matcher2, step2));
+		const match = new Match().on(matcher1, step1).on(matcher2, step2);
 
-		const result = fn(value, context, global);
+		const result = match.run(value, context, global);
 
 		expect(result).toBe(5);
 		expect(matcher1).toHaveBeenCalledWith(value, context, global);
@@ -47,9 +47,9 @@ describe("pipeline lib tap step", () => {
 		const step = jest.fn(x => x * 2);
 		const otherwise = jest.fn(x => x / 2);
 
-		const fn = match(m => m.on(matcher, step).otherwise(otherwise));
+		const match = new Match().on(matcher, step).otherwise(otherwise);
 
-		const result = fn(value, context, global);
+		const result = match.run(value, context, global);
 
 		expect(result).toBe(5);
 		expect(matcher).toHaveBeenCalledWith(value, context, global);
@@ -64,7 +64,7 @@ describe("pipeline lib tap step", () => {
 		const matcher = jest.fn((x, y) => y.run === 1);
 		const step = jest.fn(x => x * 2);
 
-		const fn = () => match(m => m.on(matcher, step))(value, context, global);
+		const fn = () => new Match().on(matcher, step).run(value, context, global);
 
 		expect(fn).toThrowError(
 			"Condition didn't match and no 'otherwise' pipeline was provided"

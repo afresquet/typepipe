@@ -1,13 +1,13 @@
 import { isPromise } from "util/types";
-import type { Pipeline } from "./types/pipeline";
-import { IsAsync } from "./types/types";
+import type { TypePipe } from "../types/TypePipe";
+import { IsAsync } from "../types/types";
 
 export function tap<
 	Value,
 	Result extends void | Promise<void>,
 	Context,
 	Global
->(fn: Pipeline.Fn<Value, Result, Context, Global>) {
+>(fn: TypePipe.Function<Value, Result, Context, Global>) {
 	return ((value, context, global) => {
 		const promise = fn(value, context, global);
 
@@ -16,5 +16,5 @@ export function tap<
 		}
 
 		return value;
-	}) as Pipeline.Fn<Value, IsAsync<Value, Result>, Context, Global>;
+	}) as TypePipe.Function<Value, IsAsync<Value, Result>, Context, Global>;
 }

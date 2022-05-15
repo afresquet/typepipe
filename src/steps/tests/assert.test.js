@@ -1,6 +1,6 @@
 const { assert } = require("../assert");
 
-describe("pipeline lib assert step", () => {
+describe("assert step", () => {
 	const value = 10;
 
 	const error = new Error("error");

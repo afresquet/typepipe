@@ -1,6 +1,6 @@
 const { tap } = require("../tap");
 
-describe("pipeline lib tap step", () => {
+describe("tap step", () => {
 	const value = 10;
 	const context = { foo: "bar" };
 	const global = { bar: "foo" };

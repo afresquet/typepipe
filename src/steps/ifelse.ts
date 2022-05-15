@@ -1,6 +1,6 @@
 import { isPromise } from "util/types";
-import type { Pipeline } from "./types/pipeline";
-import { IsAsync } from "./types/types";
+import type { TypePipe } from "../types/TypePipe";
+import { IsAsync } from "../types/types";
 
 export function ifelse<
 	Value,
@@ -12,9 +12,9 @@ export function ifelse<
 	Context,
 	Global
 >(
-	condition: Pipeline.Fn<Value, Condition, Context, Global>,
-	then: Pipeline.Fn<Value, Then, Context, Global>,
-	otherwise: Pipeline.Fn<Value, Otherwise, Context, Global> = value =>
+	condition: TypePipe.Function<Value, Condition, Context, Global>,
+	then: TypePipe.Function<Value, Then, Context, Global>,
+	otherwise: TypePipe.Function<Value, Otherwise, Context, Global> = value =>
 		value as any
 ) {
 	type Next = Then extends PromiseLike<unknown> ? Then : Otherwise;
@@ -27,7 +27,7 @@ export function ifelse<
 		}
 
 		return result ? then(...args) : otherwise(...args);
-	}) as Pipeline.Fn<
+	}) as TypePipe.Function<
 		Value,
 		Next extends PromiseLike<unknown> ? Next : IsAsync<Next, Condition>,
 		Context,

@@ -1,6 +1,6 @@
 const PipelineBuilder = require("../Pipeline").default;
 
-describe("pipeline lib PipelineBuilder", () => {
+describe("Pipeline class", () => {
 	const functions = [
 		jest.fn(x => x + 1),
 		jest.fn(x => x * 2),
