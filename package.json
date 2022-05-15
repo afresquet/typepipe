@@ -1,0 +1,26 @@
+{
+	"name": "typepipe",
+	"version": "0.0.1",
+	"description": "A library to create pipelines with strong type checking.",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsc",
+		"test": "jest"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/afresquet/typepipe.git"
+	},
+	"author": "Alvaro Fresquet (alvarofresquet@gmail.com)",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/afresquet/typepipe/issues"
+	},
+	"homepage": "https://github.com/afresquet/typepipe#readme",
+	"devDependencies": {
+		"@types/jest": "^27.5.1",
+		"jest": "^28.1.0",
+		"ts-jest": "^28.0.2",
+		"typescript": "^4.6.4"
+	}
+}
