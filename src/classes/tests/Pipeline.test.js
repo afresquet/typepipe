@@ -11,15 +11,6 @@ describe("Pipeline class", () => {
 
 	beforeEach(jest.clearAllMocks);
 
-	test("stores functions to be composed", () => {
-		const pipeline = new PipelineBuilder()
-			.pipe(functions[0])
-			.pipe(functions[1])
-			.pipe(functions[2]);
-
-		expect(pipeline.functions).toStrictEqual(functions);
-	});
-
 	test("executes functions in order and passes the contexts", () => {
 		const pipeline = new PipelineBuilder()
 			.pipe(functions[0])

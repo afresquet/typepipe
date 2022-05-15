@@ -57,6 +57,22 @@ describe("Match class", () => {
 		expect(otherwise).toHaveBeenCalledWith(value, context, global);
 	});
 
+	test("composes to a pipeline function", () => {
+		const context = { run: 1 };
+		const global = { foo: "bar" };
+
+		const matcher = jest.fn((x, y) => y.run === 1);
+		const step = jest.fn(x => x * 2);
+
+		const match = new Match().on(matcher, step).compose();
+
+		const result = match(value, context, global);
+
+		expect(result).toBe(20);
+		expect(matcher).toHaveBeenCalledWith(value, context, global);
+		expect(step).toHaveBeenCalledWith(value, context, global);
+	});
+
 	test("throws an error if condition is a promise", () => {
 		const context = { run: 1 };
 		const global = { foo: "bar" };

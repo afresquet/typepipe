@@ -56,28 +56,45 @@ export default class Match<
 		>;
 	}
 
-	run(value: Value, context: Context, global: Global): IsAsync<Result, Async> {
-		for (const { matcher, pipeline } of this.matchers) {
-			const condition = matcher(value, context, global);
+	compose() {
+		return ((value, context, global) => {
+			for (const { matcher, pipeline } of this.matchers) {
+				const condition = matcher(value, context, global);
 
-			if (isPromise(condition)) {
-				throw new Error("Condition can't be a promise");
+				if (isPromise(condition)) {
+					throw new Error("Condition can't be a promise");
+				}
+
+				if (condition) {
+					return pipeline(value, context, global) as IsAsync<Result, Async>;
+				}
 			}
 
-			if (condition) {
-				return pipeline(value, context, global) as IsAsync<Result, Async>;
+			if (!this.otherwisePipeline) {
+				throw new Error(
+					"Condition didn't match and no 'otherwise' pipeline was provided"
+				);
 			}
-		}
 
-		if (!this.otherwisePipeline) {
-			throw new Error(
-				"Condition didn't match and no 'otherwise' pipeline was provided"
-			);
-		}
-
-		return this.otherwisePipeline(value, context, global) as IsAsync<
-			Result,
-			Async
+			return this.otherwisePipeline(value, context, global) as IsAsync<
+				Result,
+				Async
+			>;
+		}) as TypePipe.Function<
+			Value,
+			IsAsync<Result, Async, true>,
+			Context,
+			Global
 		>;
+	}
+
+	run(
+		value: Value,
+		context: Context,
+		global: Global
+	): IsAsync<Result, Async, true> {
+		const composition = this.compose();
+
+		return composition(value, context, global);
 	}
 }

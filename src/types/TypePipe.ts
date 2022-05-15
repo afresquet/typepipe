@@ -6,13 +6,16 @@ export declare namespace TypePipe {
 	}
 
 	class Pipeline<Input, Current, Context, Global, Async = false> {
-		functions: Function<any, any, Context, Global>[];
-
 		pipe<Next, IsAsync = IsPromise<Next>>(
-			fn: Function<Current, Next, Context, Global>
+			fn: TypePipe.Function<Current, Next, Context, Global>
 		): Pipeline<Input, Next, Context, Global, Persist<Async, IsAsync>>;
 
-		compose(): Function<Input, IsAsync<Current, Async, true>, Context, Global>;
+		compose(): TypePipe.Function<
+			Input,
+			IsAsync<Current, Async, true>,
+			Context,
+			Global
+		>;
 
 		run(
 			value: Input,
@@ -43,6 +46,17 @@ export declare namespace TypePipe {
 			Persist<Async, IsPromise<Next>>
 		>;
 
-		run(value: Value, context: Context, global: Global): IsAsync<Result, Async>;
+		compose(): TypePipe.Function<
+			Value,
+			IsAsync<Result, Async, true>,
+			Context,
+			Global
+		>;
+
+		run(
+			value: Value,
+			context: Context,
+			global: Global
+		): IsAsync<Result, Async, true>;
 	}
 }

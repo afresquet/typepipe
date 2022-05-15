@@ -5,7 +5,7 @@ import type { IsAsync, IsPromise, Persist } from "../types/types";
 export default class Pipeline<Input, Current, Context, Global, Async = false>
 	implements TypePipe.Pipeline<Input, Current, Context, Global, Async>
 {
-	functions: TypePipe.Function<any, any, Context, Global>[] = [];
+	private functions: TypePipe.Function<any, any, Context, Global>[] = [];
 
 	pipe<Next, IsAsync = IsPromise<Next>>(
 		fn: TypePipe.Function<Current, Next, Context, Global>
