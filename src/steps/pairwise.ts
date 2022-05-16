@@ -1,6 +1,6 @@
-import { isPromise } from "util/types";
 import type { TypePipe } from "../types/TypePipe";
 import type { IsAsync } from "../types/types";
+import { isPromise } from "../utils/isPromise";
 
 export function pairwise<Value, Next, Context, Global>(
 	fn: TypePipe.Function<Value, Next, Context, Global>

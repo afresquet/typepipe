@@ -1,4 +1,3 @@
-import { isPromise } from "util/types";
 import { assert, ifelse, match, pairwise, tap } from "../steps";
 import type { TypePipe } from "../types/TypePipe";
 import type {
@@ -8,6 +7,7 @@ import type {
 	IsPromise,
 	Persist,
 } from "../types/types";
+import { isPromise } from "../utils/isPromise";
 import ChangeContext from "./ChangeContext";
 
 export default class Pipeline<
