@@ -1,11 +1,11 @@
+import Match from "../../classes/Match";
 import type { Context, Global } from "../../types/tests";
-import type { TypePipe } from "../../types/TypePipe";
 import { match } from "../match";
 
 describe("match step", () => {
 	const matchFn: (
-		m: TypePipe.Match<number, Context, Global>
-	) => TypePipe.Match<number, Context, Global, boolean> = jest.fn(m =>
+		m: Match<number, Context, Global>
+	) => Match<number, Context, Global, boolean> = jest.fn(m =>
 		m.on(
 			x => x >= 5,
 			() => true

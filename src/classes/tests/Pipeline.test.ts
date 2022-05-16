@@ -1,4 +1,5 @@
 import type { Context, Global, TestFn } from "../../types/tests";
+import type { TypePipe } from "../../types/TypePipe";
 import Pipeline from "../Pipeline";
 
 describe("Pipeline class", () => {
@@ -67,6 +68,48 @@ describe("Pipeline class", () => {
 		const result = pipeline.run(1, context, global);
 
 		expect(result).resolves.toBe("4");
+	});
+
+	test("can change the context", () => {
+		const ctx = "new context";
+		const ctxFn: TestFn<number, string> = jest.fn(() => ctx);
+		const fn: TypePipe.Function<number, string, string, Global> = jest.fn(x =>
+			x.toString()
+		);
+
+		const pipeline = new Pipeline<number, Context, Global>()
+			.pipe(fn1)
+			.context(ctxFn)
+			.pipe(fn);
+
+		const result = pipeline.run(1, context, global);
+
+		expect(result).toBe("2");
+
+		expect(fn1).toHaveBeenCalledWith(1, context, global);
+		expect(ctxFn).toHaveBeenCalledWith(2, context, global);
+		expect(fn).toHaveBeenCalledWith(2, ctx, global);
+	});
+
+	test("can change the context (promise)", async () => {
+		const ctx = "new context";
+		const ctxFn: TestFn<number, Promise<string>> = jest.fn(async () => ctx);
+		const fn: TypePipe.Function<number, string, string, Global> = jest.fn(x =>
+			x.toString()
+		);
+
+		const pipeline = new Pipeline<number, Context, Global>()
+			.pipe(fn1)
+			.context(ctxFn)
+			.pipe(fn);
+
+		const result = await pipeline.run(1, context, global);
+
+		expect(result).toBe("2");
+
+		expect(fn1).toHaveBeenCalledWith(1, context, global);
+		expect(ctxFn).toHaveBeenCalledWith(2, context, global);
+		expect(fn).toHaveBeenCalledWith(2, ctx, global);
 	});
 
 	test("can pass an error handler", () => {
