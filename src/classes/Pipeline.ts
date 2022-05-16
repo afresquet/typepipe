@@ -1,15 +1,22 @@
 import { isPromise } from "util/types";
 import { assert, ifelse, match, pairwise, tap } from "../steps";
 import type { TypePipe } from "../types/TypePipe";
-import type { Infer, IsAsync, IsPromise, Persist } from "../types/types";
+import type {
+	ExtendsNever,
+	Infer,
+	IsAsync,
+	IsPromise,
+	Persist,
+} from "../types/types";
 
 export default class Pipeline<
 	Current,
 	Context,
 	Global,
 	Input = Current,
+	Err = never,
 	Async = false
-> implements TypePipe.Pipeline<Current, Context, Global, Input, Async>
+> implements TypePipe.Pipeline<Current, Context, Global, Input, Err, Async>
 {
 	private functions: TypePipe.Function<any, any, Context, Global>[] = [];
 
@@ -23,13 +30,18 @@ export default class Pipeline<
 			Context,
 			Global,
 			Input,
+			Err,
 			Persist<Async, IsAsync>
 		>;
 	}
 
 	compose(): TypePipe.Function<
 		Input,
-		IsAsync<Current, Async, true>,
+		IsAsync<
+			ExtendsNever<Err, Current, Err extends void ? Current : Current | Err>,
+			Async,
+			true
+		>,
 		Context,
 		Global
 	> {
@@ -45,17 +57,62 @@ export default class Pipeline<
 			}
 		);
 
-		return (value, context, global) => composition(value, context, global);
+		return (value, context, global) => {
+			const onError = (error: unknown) => {
+				if (!this.errorHandler) {
+					throw error;
+				}
+
+				return this.errorHandler(error, context, global);
+			};
+
+			try {
+				const result = composition(value, context, global);
+
+				if (isPromise(result)) {
+					return result.catch(onError);
+				}
+
+				return result;
+			} catch (error) {
+				return onError(error);
+			}
+		};
 	}
 
 	run(
 		value: Input,
 		context: Context,
 		global: Global
-	): IsAsync<Current, Async, true> {
+	): IsAsync<
+		ExtendsNever<Err, Current, Err extends void ? Current : Current | Err>,
+		Async,
+		true
+	> {
 		const composition = this.compose();
 
 		return composition(value, context, global);
+	}
+
+	private errorHandler?: (
+		error: unknown,
+		context: Context,
+		global: Global
+	) => void;
+
+	catch<E>(
+		errorHandler: (error: unknown, context: Context, global: Global) => E
+	) {
+		this.errorHandler = errorHandler;
+
+		return this as unknown as Pipeline<
+			Current,
+			Context,
+			Global,
+			Input,
+			E,
+			Async
+		>;
 	}
 
 	/* ---------- Steps ---------- */

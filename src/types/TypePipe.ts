@@ -5,14 +5,32 @@ export declare namespace TypePipe {
 		(value: Value, context: Context, global: Global): Result;
 	}
 
-	class Pipeline<Current, Context, Global, Input = Current, Async = false> {
+	class Pipeline<
+		Current,
+		Context,
+		Global,
+		Input = Current,
+		Err = never,
+		Async = false
+	> {
 		pipe<Next, IsAsync = IsPromise<Next>>(
 			fn: TypePipe.Function<Current, Next, Context, Global>
-		): Pipeline<Awaited<Next>, Context, Global, Input, Persist<Async, IsAsync>>;
+		): Pipeline<
+			Awaited<Next>,
+			Context,
+			Global,
+			Input,
+			Err,
+			Persist<Async, IsAsync>
+		>;
 
 		compose(): TypePipe.Function<
 			Input,
-			IsAsync<Current, Async, true>,
+			IsAsync<
+				ExtendsNever<Err, Current, Err extends void ? Current : Current | Err>,
+				Async,
+				true
+			>,
 			Context,
 			Global
 		>;
@@ -21,7 +39,15 @@ export declare namespace TypePipe {
 			value: Input,
 			context: Context,
 			global: Global
-		): IsAsync<Current, Async, true>;
+		): IsAsync<
+			ExtendsNever<Err, Current, Err extends void ? Current : Current | Err>,
+			Async,
+			true
+		>;
+
+		catch<E>(
+			errorHandler: (error: unknown, context: Context, global: Global) => E
+		): Pipeline<Current, Context, Global, Input, E, Async>;
 
 		/* ---------- Steps ---------- */
 
