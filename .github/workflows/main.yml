@@ -26,7 +26,7 @@ jobs:
       - name: Typescript
         uses: iCrawl/action-tsc@v1
   test:
-    runs-on: ububtu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
