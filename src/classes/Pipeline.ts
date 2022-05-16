@@ -8,16 +8,17 @@ import type {
 	IsPromise,
 	Persist,
 } from "../types/types";
+import ChangeContext from "./ChangeContext";
 
 export default class Pipeline<
 	Current,
 	Context,
 	Global,
 	Input = Current,
+	ContextInput = Context,
 	Err = never,
 	Async = false
-> implements TypePipe.Pipeline<Current, Context, Global, Input, Err, Async>
-{
+> {
 	private functions: TypePipe.Function<any, any, Context, Global>[] = [];
 
 	pipe<Next, IsAsync = IsPromise<Next>>(
@@ -30,6 +31,25 @@ export default class Pipeline<
 			Context,
 			Global,
 			Input,
+			ContextInput,
+			Err,
+			Persist<Async, IsAsync>
+		>;
+	}
+
+	context<Next, IsAsync = IsPromise<Next>>(
+		fn: TypePipe.Function<Current, Next, Context, Global>
+	) {
+		this.functions.push(
+			(value, context, global) => new ChangeContext(value, context, global, fn)
+		);
+
+		return this as unknown as Pipeline<
+			Current,
+			Awaited<Next>,
+			Global,
+			Input,
+			ContextInput,
 			Err,
 			Persist<Async, IsAsync>
 		>;
@@ -42,15 +62,29 @@ export default class Pipeline<
 			Async,
 			true
 		>,
-		Context,
+		ContextInput,
 		Global
 	> {
 		const composition = this.functions.reduce(
 			(fn1, fn2) => (value, context, global) => {
 				const res = fn1(value, context, global);
 
+				if (res instanceof ChangeContext) {
+					const ctx = res.run();
+
+					if (isPromise(ctx)) {
+						return ctx.then(c => {
+							return fn2(res.value, c as any, global);
+						});
+					}
+
+					return fn2(res.value, ctx, global);
+				}
+
 				if (isPromise(res)) {
-					return res.then(r => fn2(r, context, global));
+					return res.then(r => {
+						return fn2(r, context, global);
+					});
 				}
 
 				return fn2(res, context, global);
@@ -67,7 +101,7 @@ export default class Pipeline<
 			};
 
 			try {
-				const result = composition(value, context, global);
+				const result = composition(value, context as any, global);
 
 				if (isPromise(result)) {
 					return result.catch(onError);
@@ -82,7 +116,7 @@ export default class Pipeline<
 
 	run(
 		value: Input,
-		context: Context,
+		context: ContextInput,
 		global: Global
 	): IsAsync<
 		ExtendsNever<Err, Current, Err extends void ? Current : Current | Err>,
@@ -96,12 +130,12 @@ export default class Pipeline<
 
 	private errorHandler?: (
 		error: unknown,
-		context: Context,
+		context: ContextInput,
 		global: Global
 	) => void;
 
 	catch<E>(
-		errorHandler: (error: unknown, context: Context, global: Global) => E
+		errorHandler: (error: unknown, context: ContextInput, global: Global) => E
 	) {
 		this.errorHandler = errorHandler;
 
@@ -110,6 +144,7 @@ export default class Pipeline<
 			Context,
 			Global,
 			Input,
+			ContextInput,
 			E,
 			Async
 		>;
@@ -127,6 +162,8 @@ export default class Pipeline<
 			Context,
 			Global,
 			Input,
+			ContextInput,
+			Err,
 			Persist<Async, IsPromise<Thrown>>
 		>;
 	}
@@ -155,6 +192,8 @@ export default class Pipeline<
 			Context,
 			Global,
 			Input,
+			ContextInput,
+			Err,
 			Persist<Async, AreFunctionsAsync>
 		>;
 	}
@@ -176,6 +215,8 @@ export default class Pipeline<
 			Context,
 			Global,
 			Input,
+			ContextInput,
+			Err,
 			Persist<Async, MatchAsync>
 		>;
 	}
@@ -188,6 +229,8 @@ export default class Pipeline<
 			Context,
 			Global,
 			Input,
+			ContextInput,
+			Err,
 			Persist<Async, IsPromise<Next>>
 		>;
 	}
@@ -202,6 +245,8 @@ export default class Pipeline<
 			Context,
 			Global,
 			Input,
+			ContextInput,
+			Err,
 			Persist<Async, IsPromise<Result>>
 		>;
 	}

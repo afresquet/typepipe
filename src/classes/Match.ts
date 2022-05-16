@@ -8,8 +8,7 @@ export default class Match<
 	Global,
 	Result = never,
 	Async = false
-> implements TypePipe.Match<Value, Context, Global, Result, Async>
-{
+> {
 	private matchers: {
 		matcher: TypePipe.Function<Value, boolean, Context, Global>;
 		pipeline: TypePipe.Function<
