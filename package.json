@@ -6,7 +6,9 @@
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc -w",
-		"test": "jest"
+		"test": "jest",
+		"format": "prettier --write 'src/**/*.ts'",
+		"format:check": "prettier --check 'src/**/*.ts'"
 	},
 	"repository": {
 		"type": "git",
