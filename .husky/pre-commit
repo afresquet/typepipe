@@ -4,3 +4,5 @@
 npx pretty-quick --staged
 
 npx tsc --noEmit
+
+npm test
