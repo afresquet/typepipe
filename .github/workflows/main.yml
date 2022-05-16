@@ -12,3 +12,6 @@ jobs:
 
       - name: Prettier Action
         uses: creyD/prettier_action@v4.2
+
+      - name: Typescript compiler
+        uses: iCrawl/action-tsc@v1
