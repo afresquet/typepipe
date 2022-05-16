@@ -10,8 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Prettier Action
+      - name: Prettier
         uses: creyD/prettier_action@v4.2
 
-      - name: Typescript compiler
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Typescript
         uses: iCrawl/action-tsc@v1
