@@ -68,4 +68,66 @@ describe("Pipeline class", () => {
 
 		expect(result).resolves.toBe("4");
 	});
+
+	test("can pass an error handler", () => {
+		const error = new Error();
+		const fn: TestFn<number, number> = jest.fn(() => {
+			throw error;
+		});
+		const expected = "Error";
+		const catchError: TestFn<unknown, string> = jest.fn(() => expected);
+
+		const pipeline = new Pipeline<number, Context, Global>()
+			.pipe(fn)
+			.catch(catchError);
+
+		const result = pipeline.run(1, context, global);
+
+		expect(result).toBe(expected);
+		expect(catchError).toHaveBeenCalledWith(error, context, global);
+	});
+
+	test("throws original error if no error handler is provided", () => {
+		const error = new Error();
+		const badFn: TestFn<number, number> = jest.fn(() => {
+			throw error;
+		});
+
+		const pipeline = new Pipeline<number, Context, Global>().pipe(badFn);
+
+		const fn = () => pipeline.run(1, context, global);
+
+		expect(fn).toThrowError(error);
+	});
+
+	test("can pass an error handler (promise)", async () => {
+		const error = new Error();
+		const fn: TestFn<number, Promise<number>> = jest.fn(async () => {
+			throw error;
+		});
+		const expected = "Error";
+		const catchError: TestFn<unknown, string> = jest.fn(() => expected);
+
+		const pipeline = new Pipeline<number, Context, Global>()
+			.pipe(fn)
+			.catch(catchError);
+
+		const result = await pipeline.run(1, context, global);
+
+		expect(result).toBe(expected);
+		expect(catchError).toHaveBeenCalledWith(error, context, global);
+	});
+
+	test("throws original error if no error handler is provided (promise)", () => {
+		const error = new Error();
+		const badFn: TestFn<number, Promise<number>> = jest.fn(async () => {
+			throw error;
+		});
+
+		const pipeline = new Pipeline<number, Context, Global>().pipe(badFn);
+
+		const result = pipeline.run(1, context, global);
+
+		expect(result).rejects.toThrowError(error);
+	});
 });
