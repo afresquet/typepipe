@@ -1,5 +1,5 @@
+import Match from ".";
 import type { Context, Global, TestFn } from "../../types/tests";
-import Match from "../Match";
 
 describe("Match class", () => {
 	const value = 10;
