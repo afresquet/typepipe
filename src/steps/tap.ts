@@ -1,6 +1,6 @@
-import { isPromise } from "util/types";
 import type { TypePipe } from "../types/TypePipe";
 import type { IsAsync } from "../types/types";
+import { isPromise } from "../utils/isPromise";
 
 export function tap<
 	Value,

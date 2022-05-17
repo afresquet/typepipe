@@ -1,11 +1,11 @@
-name: CI
+name: CI/CD
 
 on:
   push:
   pull_request:
 
 jobs:
-  prettier:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -14,18 +14,16 @@ jobs:
       - name: Prettier
         uses: creyD/prettier_action@v4.2
 
-  typescript:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: Install Dependencies
         run: npm install
 
       - name: Typescript
         uses: iCrawl/action-tsc@v1
-  test:
+
+      - name: Tests
+        run: npm test
+
+  cd:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,5 +32,5 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Tests
-        run: npm test
+      - name: Build
+        run: npm run build
