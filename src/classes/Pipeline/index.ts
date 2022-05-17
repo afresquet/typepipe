@@ -8,6 +8,7 @@ import type {
 	Persist,
 } from "../../types/types";
 import ChangeContext from "../../utils/ChangeContext";
+import ErrorHandler from "../../utils/ErrorHandler";
 import { isPromise } from "../../utils/isPromise";
 
 /**
@@ -103,9 +104,9 @@ export default class Pipeline<
 	 * ```
 	 */
 	catch<E>(
-		errorHandler: (error: unknown, context: ContextInput, global: Global) => E
+		errorHandler: (error: unknown, context: Context, global: Global) => E
 	) {
-		this.errorHandler = errorHandler;
+		this.functions.push(value => new ErrorHandler(value, errorHandler));
 
 		return this as unknown as Pipeline<
 			Current,
@@ -113,7 +114,7 @@ export default class Pipeline<
 			Global,
 			Input,
 			ContextInput,
-			E,
+			ExtendsNever<Err, E, Err | E>,
 			Async
 		>;
 	}
@@ -171,6 +172,14 @@ export default class Pipeline<
 					}
 
 					return fn2(res.value, ctx, global);
+				}
+
+				if (res instanceof ErrorHandler) {
+					const errorHandler = res.run();
+
+					this.errorHandler = errorHandler;
+
+					return fn2(res.value, context, global);
 				}
 
 				if (isPromise(res)) {

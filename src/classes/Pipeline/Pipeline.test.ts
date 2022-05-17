@@ -1,6 +1,6 @@
+import Pipeline from ".";
 import type { Context, Global, TestFn } from "../../types/tests";
 import type { TypePipe } from "../../types/TypePipe";
-import Pipeline from "../Pipeline";
 
 describe("Pipeline class", () => {
 	const fn1: TestFn<number, number> = jest.fn(x => x + 1);
@@ -121,13 +121,62 @@ describe("Pipeline class", () => {
 		const catchError: TestFn<unknown, string> = jest.fn(() => expected);
 
 		const pipeline = new Pipeline<number, Context, Global>()
-			.pipe(fn)
-			.catch(catchError);
+			.catch(catchError)
+			.pipe(fn);
 
 		const result = pipeline.run(1, context, global);
 
 		expect(result).toBe(expected);
 		expect(catchError).toHaveBeenCalledWith(error, context, global);
+	});
+
+	test("can pass multiple error handlers", () => {
+		const error = new Error();
+
+		const expected1 = "Error1";
+		const catchError1: TestFn<unknown, string> = jest.fn(() => expected1);
+		const expected2 = ["Error2"];
+		const catchError2: TestFn<unknown, string[]> = jest.fn(() => expected2);
+
+		const eh1: TestFn<number, number> = jest.fn(value => {
+			if (value < 5) {
+				throw error;
+			}
+
+			return value * 2;
+		});
+		const eh2: TestFn<number, number> = jest.fn(value => {
+			if (value > 15) {
+				throw error;
+			}
+
+			return value / 2;
+		});
+		const eh3: TestFn<number, string> = jest.fn(value => value.toString());
+
+		const pipeline = new Pipeline<number, Context, Global>()
+			.catch(catchError1)
+			.pipe(eh1)
+			.catch(catchError2)
+			.pipe(eh2)
+			.pipe(eh3);
+
+		const result1 = pipeline.run(4, context, global);
+
+		expect(result1).toBe(expected1);
+		expect(eh1).toHaveBeenCalledWith(4, context, global);
+		expect(catchError1).toHaveBeenCalledWith(error, context, global);
+
+		const result2 = pipeline.run(20, context, global);
+
+		expect(result2).toBe(expected2);
+		expect(eh2).toHaveBeenCalledWith(40, context, global);
+		expect(catchError2).toHaveBeenCalledWith(error, context, global);
+
+		const result3 = pipeline.run(7, context, global);
+
+		expect(result3).toBe("7");
+		expect(eh3).toHaveBeenCalledWith(7, context, global);
 	});
 
 	test("throws original error if no error handler is provided", () => {
@@ -152,8 +201,8 @@ describe("Pipeline class", () => {
 		const catchError: TestFn<unknown, string> = jest.fn(() => expected);
 
 		const pipeline = new Pipeline<number, Context, Global>()
-			.pipe(fn)
-			.catch(catchError);
+			.catch(catchError)
+			.pipe(fn);
 
 		const result = await pipeline.run(1, context, global);
 
