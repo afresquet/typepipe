@@ -17,6 +17,7 @@ describe("isPromise util", () => {
 		expect(isPromise(Date)).toBe(false);
 		expect(isPromise("")).toBe(false);
 		expect(isPromise({})).toBe(false);
+		expect(isPromise({ then: () => {} })).toBe(false);
 		expect(isPromise([])).toBe(false);
 		expect(isPromise(() => {})).toBe(false);
 	});
