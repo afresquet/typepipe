@@ -21,6 +21,9 @@ npm install typepipe
   - [match](./src/steps/README.md#match)
   - [pairwise](./src/steps/README.md#pairwise)
   - [tap](./src/steps/README.md#tap)
+- [`TypePipe` namespace](./src/types/TypePipe/README.md#typepipe-namespace)
+  - [Function](./src/types/TypePipe/README.md#typepipefunction)
+  - [MatchFunction](./src/types/TypePipe/README.md#typepipematchfunction)
 
 ## Usage
 

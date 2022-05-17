@@ -54,7 +54,7 @@ asyncFn(2, context, global); // Promise => 4
 
 ## match
 
-Creates a function that will run the given callback with a [Match](../classes/Match/README.md#match) object passed as the argument, that will have it's method `run` be called with the received arguments.
+Creates a function that will run the given [TypePipe.MatchFunction](../types/TypePipe/README.md#typepipematchfunction) callback with a [Match](../classes/Match/README.md#match) object passed as the argument, that will have it's method `run` be called with the received arguments.
 
 It will return the value that the [Match](../classes/Match/README.md#match) object returns, if it's a `Promise` TypeScript will infer it.
 
