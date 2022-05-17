@@ -151,6 +151,10 @@ const numberToString: MyFunction<number, string> = (value, context, global) => {
 const pipelineNumber = new MyPipeline<number>().pipe(numberToString);
 ```
 
+## Examples
+
+You can find some examples in the [examples](./examples/README.md#examples) folder.
+
 ## Contribute
 
 1. Fork the repository and clone it to your computer.
