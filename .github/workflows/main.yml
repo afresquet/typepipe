@@ -1,0 +1,49 @@
+name: CI/CD
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Prettier
+        uses: creyD/prettier_action@v4.2
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Typescript
+        uses: iCrawl/action-tsc@v1
+
+      - name: Tests
+        run: npm test
+
+  cd:
+    runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/master'
+    needs: ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish
+        run: npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

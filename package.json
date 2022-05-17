@@ -1,11 +1,21 @@
 {
 	"name": "typepipe",
-	"version": "0.0.1",
-	"description": "A library to create pipelines with strong type checking.",
+	"version": "1.0.0",
+	"description": "A library to create pipelines with contexts and strong type checking.",
 	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"umd": "dist/index.umd.js",
+	"typings": "dist/index.d.ts",
 	"scripts": {
-		"build": "tsc",
-		"test": "jest"
+		"prebuild": "rimraf dist",
+		"build": "rollup -c",
+		"watch": "npm run build -- -w --dev",
+		"test": "jest",
+		"format": "prettier --write 'src/**/*.ts'",
+		"format:check": "prettier --check 'src/**/*.ts'",
+		"prepare": "husky install",
+		"docs": "typedoc",
+		"docs:watch": "typedoc --watch"
 	},
 	"repository": {
 		"type": "git",
@@ -19,8 +29,16 @@
 	"homepage": "https://github.com/afresquet/typepipe#readme",
 	"devDependencies": {
 		"@types/jest": "^27.5.1",
+		"husky": "^8.0.0",
 		"jest": "^28.1.0",
+		"prettier": "^2.6.2",
+		"pretty-quick": "^3.1.3",
+		"rimraf": "^3.0.2",
+		"rollup": "^2.73.0",
+		"rollup-plugin-terser": "^7.0.2",
+		"rollup-plugin-typescript2": "^0.31.2",
 		"ts-jest": "^28.0.2",
+		"typedoc": "^0.22.15",
 		"typescript": "^4.6.4"
 	}
 }

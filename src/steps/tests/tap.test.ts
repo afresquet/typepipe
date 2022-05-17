@@ -1,12 +1,13 @@
-const { tap } = require("../tap");
+import type { Context, Global, TestFn } from "../../types/tests";
+import { tap } from "../tap";
 
-describe("pipeline lib tap step", () => {
+describe("tap step", () => {
 	const value = 10;
-	const context = { foo: "bar" };
-	const global = { bar: "foo" };
+	const context: Context = { foo: "bar" };
+	const global: Global = { bar: "foo" };
 
 	test("return the same value", () => {
-		const fn = jest.fn(x => x * 2);
+		const fn: TestFn<number, void> = jest.fn();
 
 		const result = tap(fn)(value, context, global);
 
@@ -16,7 +17,7 @@ describe("pipeline lib tap step", () => {
 	});
 
 	test("work with promises", () => {
-		const fn = jest.fn(async x => x * 2);
+		const fn: TestFn<number, Promise<void>> = jest.fn(async () => {});
 
 		const result = tap(fn)(value, context, global);
 
