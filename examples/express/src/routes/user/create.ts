@@ -21,7 +21,7 @@ export const userCreateRoute: Route<Body> = {
 	execute: new RoutePipeline<Body>()
 		.catch(json(400))
 		.pipe(getBodyParams("name", "email"))
-		.assert(RouteErrors.MissingArguments)
+		.assert(() => new RouteErrors.MissingArguments())
 		.catch(json(500))
 		.pipe(createUser)
 		.pipe(json(201))

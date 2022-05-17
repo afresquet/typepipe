@@ -1,17 +1,25 @@
 export class RouteErrors {
-	static Exit() {
-		return new Error("Exit");
-	}
+	static Exit = class Exit extends Error {
+		constructor() {
+			super("Exit");
+		}
+	};
 
-	static MissingArguments() {
-		return new Error("Missing arguments");
-	}
+	static MissingArguments = class MissingArguments extends Error {
+		constructor() {
+			super("MissingArguments");
+		}
+	};
 
-	static NotFound() {
-		return new Error("Not found");
-	}
+	static NotFound = class NotFound extends Error {
+		constructor() {
+			super("NotFound");
+		}
+	};
 
-	static InternalError() {
-		return new Error("Internal error");
-	}
+	static InternalError = class InternalError extends Error {
+		constructor() {
+			super("InternalError");
+		}
+	};
 }

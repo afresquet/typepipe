@@ -23,7 +23,7 @@ export const userUpdateRoute: Route<Body, Params> = {
 		.pipe(findUser)
 		.catch(json(500))
 		.pipe(updateUser)
-		.assert(RouteErrors.InternalError)
+		.assert(() => new RouteErrors.InternalError())
 		.pipe(json(200))
 		.compose(),
 };

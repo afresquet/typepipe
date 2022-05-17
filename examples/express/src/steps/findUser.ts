@@ -23,8 +23,8 @@ export const findUser: RouteFunction<
 > = new RoutePipeline<{}, Params>()
 	.catch(json(400))
 	.pipe(getParams("id"))
-	.assert(RouteErrors.MissingArguments)
+	.assert(() => new RouteErrors.MissingArguments())
 	.catch(json(404))
 	.pipe(readUser)
-	.assert(RouteErrors.NotFound)
+	.assert(() => new RouteErrors.NotFound())
 	.compose();

@@ -1,4 +1,5 @@
 import { RouteFunction } from "../types/RoutePipeline";
+import { RouteErrors } from "../utils/RouteErrors";
 
 export const json: <T>(statusCode: number) => RouteFunction<T, void> =
 	(statusCode = 200) =>
@@ -8,7 +9,7 @@ export const json: <T>(statusCode: number) => RouteFunction<T, void> =
 				error: value.message,
 			});
 
-			return;
+			throw new RouteErrors.Exit();
 		}
 
 		res.status(statusCode).json(value);

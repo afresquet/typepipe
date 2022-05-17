@@ -1,14 +1,21 @@
 import express from "express";
 import { UserModel } from "./db/User";
 import routes from "./routes";
+import { RouteErrors } from "./utils/RouteErrors";
 
 const app = express();
 
 app.use(express.json());
 
 for (const route of routes) {
-	app[route.method](route.path, async (req, res) => {
-		await route.execute(req, { req, res }, { UserModel });
+	app[route.method](route.path, async (req, res, next) => {
+		try {
+			await route.execute(req, { req, res }, { UserModel });
+		} catch (error) {
+			if (error instanceof RouteErrors.Exit) return;
+
+			next(error);
+		}
 	});
 }
 

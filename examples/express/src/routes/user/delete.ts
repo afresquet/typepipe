@@ -22,7 +22,7 @@ export const userDeleteRoute: Route<{}, Params> = {
 		.pipe(findUser)
 		.catch(json(500))
 		.pipe(deleteUser)
-		.assert(RouteErrors.InternalError)
+		.assert(() => new RouteErrors.InternalError())
 		.pipe(json(200))
 		.compose(),
 };
