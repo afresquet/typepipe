@@ -1,0 +1,10 @@
+.github
+.husky
+docs
+examples
+src
+.gitignore
+.prettierrc
+jest.config.js
+rollup.config.js
+typedoc.js
