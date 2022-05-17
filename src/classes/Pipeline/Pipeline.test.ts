@@ -179,6 +179,39 @@ describe("Pipeline class", () => {
 		expect(eh3).toHaveBeenCalledWith(7, context, global);
 	});
 
+	test("clears error handler before starting", () => {
+		const error = new Error();
+		const fn: TestFn<number, number> = jest.fn(value => {
+			if (value < 5) {
+				throw error;
+			}
+
+			return value * 2;
+		});
+		const expected = "Error";
+		const catchError: TestFn<unknown, string> = jest.fn(() => expected);
+
+		const pipeline = new Pipeline<number, Context, Global>()
+			.pipe(value => {
+				if (value > 5) {
+					throw error;
+				}
+
+				return value;
+			})
+			.catch(catchError)
+			.pipe(fn)
+			.compose();
+
+		const result = pipeline(1, context, global);
+
+		expect(result).toBe(expected);
+		expect(catchError).toHaveBeenCalledWith(error, context, global);
+
+		expect(() => pipeline(10, context, global)).toThrow(error);
+		expect(catchError).toHaveBeenCalledTimes(1);
+	});
+
 	test("throws original error if no error handler is provided", () => {
 		const error = new Error();
 		const badFn: TestFn<number, number> = jest.fn(() => {

@@ -210,6 +210,9 @@ export default class Pipeline<
 		);
 
 		return (value, context, global) => {
+			// Reset the error handler
+			this.errorHandler = undefined;
+
 			const onError = (error: unknown) => {
 				if (!this.errorHandler) {
 					throw error;
