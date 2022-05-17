@@ -1,16 +1,18 @@
-# Express Example
+# Express.js Example
 
 ## Usage
 
-Install dependencies
+From the root of TypePipe run:
 
 ```shell
 npm install
-```
 
-Run on watch mode
+npm run build
 
-```shell
+cd examples/express
+
+npm install
+
 npm run dev
 ```
 
