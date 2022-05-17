@@ -1,15 +1,18 @@
-import { assert, ifelse, match, pairwise, tap } from "../steps";
-import type { TypePipe } from "../types/TypePipe";
+import { assert, ifelse, match, pairwise, tap } from "../../steps";
+import type { TypePipe } from "../../types/TypePipe";
 import type {
 	ExtendsNever,
 	Infer,
 	IsAsync,
 	IsPromise,
 	Persist,
-} from "../types/types";
-import { isPromise } from "../utils/isPromise";
-import ChangeContext from "./ChangeContext";
+} from "../../types/types";
+import ChangeContext from "../../utils/ChangeContext";
+import { isPromise } from "../../utils/isPromise";
 
+/**
+ * Pipes functions with the given value, context, and global context.
+ */
 export default class Pipeline<
 	Current,
 	Context,
@@ -21,6 +24,18 @@ export default class Pipeline<
 > {
 	private functions: TypePipe.Function<any, any, Context, Global>[] = [];
 
+	/**
+	 * Adds a function to the pipeline,
+	 * the value returned will be passed to the next piped function.
+	 *
+	 * @example
+	 * ```ts
+	 * const pipeline = new Pipeline()
+	 * 	.pipe((value, context, global) => value + 1)
+	 * 	.pipe((value, context, global) => value.toString())
+	 * 	.pipe((value, context, global) => [value]);
+	 * ```
+	 */
 	pipe<Next, IsAsync extends boolean = IsPromise<Next>>(
 		fn: TypePipe.Function<Current, Next, Context, Global>
 	) {
@@ -37,6 +52,17 @@ export default class Pipeline<
 		>;
 	}
 
+	/**
+	 * Changes the context passed to the following functions of the pipeline.
+	 *
+	 * @example
+	 * ```ts
+	 * const pipeline = new Pipeline()
+	 * 	.pipe((value, context, global) => value + 1) // context = "original context"
+	 * 	.context((value, context, global) => context.split(" ")[1])
+	 * 	.pipe((value, context, global) => context); // context = "context"
+	 * ```
+	 */
 	context<Next, IsAsync extends boolean = IsPromise<Next>>(
 		fn: TypePipe.Function<Current, Next, Context, Global>
 	) {
@@ -55,6 +81,72 @@ export default class Pipeline<
 		>;
 	}
 
+	private errorHandler?: (
+		error: unknown,
+		context: ContextInput,
+		global: Global
+	) => void;
+
+	/**
+	 * Adds an optional error handler that will be run if any of the piped functions fail.
+	 *
+	 * By default there's no error handler and any errors will be thrown.
+	 *
+	 * If this method is called more than once, the newest one will override the last one.
+	 *
+	 * @example
+	 * ```ts
+	 * const pipeline = new Pipeline()
+	 * 	.pipe((value, context, global) => value + 1)
+	 * 	.pipe((value, context, global) => value.bad_parameter) // Will throw
+	 * 	.pipe((value, context, global) => [value]); // Will log Syntax Error
+	 * ```
+	 */
+	catch<E>(
+		errorHandler: (error: unknown, context: ContextInput, global: Global) => E
+	) {
+		this.errorHandler = errorHandler;
+
+		return this as unknown as Pipeline<
+			Current,
+			Context,
+			Global,
+			Input,
+			ContextInput,
+			E,
+			Async
+		>;
+	}
+
+	/**
+	 * Creates a function that will run all the piped functions in order.
+	 *
+	 * The first function will receive the given values,the subsequent functions
+	 * will receive the value returned from the previous function and the contexts.
+	 *
+	 * If any of the functions returns a Promise,
+	 * the returned value will be wrapped in a Promise.
+	 *
+	 * @example
+	 * ```ts
+	 * const fn = new Pipeline()
+	 * 	.pipe((value, context, global) => value + 1)
+	 * 	.pipe((value, context, global) => value.toString())
+	 * 	.pipe((value, context, global) => [value])
+	 * 	.compose();
+	 *
+	 * fn(1, context, global); ["2"]
+	 * fn(5, context, global); // ["6"]
+	 *
+	 * const asyncFn = new Pipeline()
+	 * 	.pipe((value, context, global) => value + 1)
+	 * 	.pipe((value, context, global) => value.toString())
+	 * 	.pipe((value, context, global) => [value])
+	 * 	.compose();
+	 *
+	 * asyncFn(1, context, global); // Promise => ["2"]
+	 * asyncFn(5, context, global); // Promise => ["6"]
+	 */
 	compose(): TypePipe.Function<
 		Input,
 		IsAsync<
@@ -114,6 +206,32 @@ export default class Pipeline<
 		};
 	}
 
+	/**
+	 * Calls the composed function from `Pipeline.compose` with the given values
+	 * and returns the result.
+	 *
+	 * @see Pipeline#compose
+	 *
+	 * @example
+	 * ```ts
+	 * const pipeline = new Pipeline()
+	 * 	.pipe((value, context, global) => value + 1)
+	 * 	.pipe((value, context, global) => value.toString())
+	 * 	.pipe((value, context, global) => [value])
+	 * 	.compose();
+	 *
+	 * pipeline.run(1, context, global); ["2"]
+	 * pipeline.run(5, context, global); // ["6"]
+	 *
+	 * const asyncPipeline = new Pipeline()
+	 * 	.pipe((value, context, global) => value + 1)
+	 * 	.pipe((value, context, global) => value.toString())
+	 * 	.pipe((value, context, global) => [value])
+	 * 	.compose();
+	 *
+	 * asyncPipeline.run(1, context, global); // Promise => ["2"]
+	 * asyncPipeline.run(5, context, global); // Promise => ["6"]
+	 */
 	run(
 		value: Input,
 		context: ContextInput,
@@ -128,30 +246,13 @@ export default class Pipeline<
 		return composition(value, context, global);
 	}
 
-	private errorHandler?: (
-		error: unknown,
-		context: ContextInput,
-		global: Global
-	) => void;
-
-	catch<E>(
-		errorHandler: (error: unknown, context: ContextInput, global: Global) => E
-	) {
-		this.errorHandler = errorHandler;
-
-		return this as unknown as Pipeline<
-			Current,
-			Context,
-			Global,
-			Input,
-			ContextInput,
-			E,
-			Async
-		>;
-	}
-
 	/* ---------- Steps ---------- */
 
+	/**
+	 * Adds an `assert` step to the pipeline.
+	 *
+	 * @see {@link assert}
+	 */
 	assert<Thrown>(
 		throwable: TypePipe.Function<Current, Thrown, Context, Global>
 	) {
@@ -168,6 +269,11 @@ export default class Pipeline<
 		>;
 	}
 
+	/**
+	 * Adds an `ifelse` step to the pipeline.
+	 *
+	 * @see {@link ifelse}
+	 */
 	ifelse<
 		Condition extends boolean | Promise<boolean>,
 		Then,
@@ -199,6 +305,11 @@ export default class Pipeline<
 		>;
 	}
 
+	/**
+	 * Adds a `match` step to the pipeline.
+	 *
+	 * @see {@link match}
+	 */
 	match<Result, MatchAsync extends boolean>(
 		matchFn: TypePipe.MatchFunction<
 			Current,
@@ -222,6 +333,11 @@ export default class Pipeline<
 		>;
 	}
 
+	/**
+	 * Adds a `pairwise` step to the pipeline.
+	 *
+	 * @see {@link pairwise}
+	 */
 	pairwise<Next>(fn: TypePipe.Function<Current, Next, Context, Global>) {
 		this.pipe(pairwise(fn));
 
@@ -236,6 +352,11 @@ export default class Pipeline<
 		>;
 	}
 
+	/**
+	 * Adds a `tap` step to the pipeline.
+	 *
+	 * @see {@link tap}
+	 */
 	tap<Result extends void | Promise<void>>(
 		fn: TypePipe.Function<Current, Result, Context, Global>
 	) {
