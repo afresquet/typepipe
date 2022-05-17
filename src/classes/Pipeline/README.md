@@ -40,18 +40,34 @@ const pipeline = new Pipeline()
 
 ### catch
 
-Adds an optional error handler that will be run if any of the piped functions fail.
+Adds an error handler that will be run if any of the piped functions fail.
 
 By default there's no error handler and any errors will be thrown.
 
 If this method is called more than once, the newest one will override the last one.
 
+This method should be called before piping any functions that you want to handle errors for.
+
 ```ts
 const pipeline = new Pipeline()
+	.catch((error, context, global) => console.log(error)) // Will log Syntax Error
 	.pipe((value, context, global) => value + 1)
 	.pipe((value, context, global) => value.bad_parameter) // Will throw error
-	.pipe((value, context, global) => [value])
-	.catch((error, context, global) => console.log(error)); // Will log Syntax Error
+	.pipe((value, context, global) => [value]);
+
+const pipeline2 = new Pipeline()
+	.catch((error, context, global) => console.log("Error Handler 1"))
+	.tap((value, context, global) => {
+		if (value > 10) throw new Error("Value is too high");
+	})
+	.catch((error, context, global) => console.log("Error Handler 2"))
+	.tap((value, context, global) => {
+		if (value < 5) throw new Error("Value is too low");
+	});
+
+pipeline2.run(15, context, global); // Returns nothing | Console log: Error Handler 1
+pipeline2.run(1, context, global); // Returns nothing | Console log: Error Handler 2
+pipeline2.run(7, context, global); // Returns 7
 ```
 
 ### compose
