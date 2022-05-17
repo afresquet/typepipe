@@ -1,5 +1,7 @@
 # Steps
 
+Steps return functions with extra functionality.
+
 - [assert](#assert)
 - [ifelse](#ifelse)
 - [match](#match)
@@ -52,9 +54,9 @@ asyncFn(2, context, global); // Promise => 4
 
 ## match
 
-Creates a function that will run the given callback with a `Match` object passed as the argument, that will have it's method `run` be called with the received arguments.
+Creates a function that will run the given callback with a [Match](../classes/Match/README.md#match) object passed as the argument, that will have it's method `run` be called with the received arguments.
 
-It will return the value that the `Match` object returns, if it's a `Promise` TypeScript will infer it.
+It will return the value that the [Match](../classes/Match/README.md#match) object returns, if it's a `Promise` TypeScript will infer it.
 
 ```ts
 const fn = match(m =>
