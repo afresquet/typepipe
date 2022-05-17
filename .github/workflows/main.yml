@@ -15,7 +15,7 @@ jobs:
         uses: creyD/prettier_action@v4.2
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Typescript
         uses: iCrawl/action-tsc@v1
@@ -25,6 +25,8 @@ jobs:
 
   cd:
     runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/master'
+    needs: ci
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -42,7 +44,6 @@ jobs:
         run: npm run build
 
       - name: Publish
-        if: github.ref == 'refs/heads/master'
         run: npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
