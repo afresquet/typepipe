@@ -1,7 +1,7 @@
 {
 	"name": "typepipe",
 	"version": "0.0.1",
-	"description": "A library to create pipelines with strong type checking.",
+	"description": "A library to create pipelines with contexts and strong type checking.",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"umd": "dist/index.umd.js",
