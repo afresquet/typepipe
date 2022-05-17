@@ -21,7 +21,7 @@ export default class Pipeline<
 > {
 	private functions: TypePipe.Function<any, any, Context, Global>[] = [];
 
-	pipe<Next, IsAsync = IsPromise<Next>>(
+	pipe<Next, IsAsync extends boolean = IsPromise<Next>>(
 		fn: TypePipe.Function<Current, Next, Context, Global>
 	) {
 		this.functions.push(fn);
@@ -37,7 +37,7 @@ export default class Pipeline<
 		>;
 	}
 
-	context<Next, IsAsync = IsPromise<Next>>(
+	context<Next, IsAsync extends boolean = IsPromise<Next>>(
 		fn: TypePipe.Function<Current, Next, Context, Global>
 	) {
 		this.functions.push(
@@ -179,14 +179,6 @@ export default class Pipeline<
 	) {
 		this.pipe(ifelse(condition, then, otherwise));
 
-		type AreFunctionsAsync = Condition extends PromiseLike<unknown>
-			? true
-			: Then extends PromiseLike<unknown>
-			? true
-			: Otherwise extends PromiseLike<unknown>
-			? true
-			: false;
-
 		return this as unknown as Pipeline<
 			Awaited<Then>,
 			Context,
@@ -194,11 +186,20 @@ export default class Pipeline<
 			Input,
 			ContextInput,
 			Err,
-			Persist<Async, AreFunctionsAsync>
+			Persist<
+				Async,
+				Condition extends PromiseLike<unknown>
+					? true
+					: Then extends PromiseLike<unknown>
+					? true
+					: Otherwise extends PromiseLike<unknown>
+					? true
+					: false
+			>
 		>;
 	}
 
-	match<Result, MatchAsync>(
+	match<Result, MatchAsync extends boolean>(
 		matchFn: TypePipe.MatchFunction<
 			Current,
 			Result,
