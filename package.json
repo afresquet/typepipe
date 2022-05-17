@@ -1,7 +1,7 @@
 {
 	"name": "typepipe",
 	"version": "0.0.1",
-	"description": "A library to create pipelines with strong type checking.",
+	"description": "A library to create pipelines with contexts and strong type checking.",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"umd": "dist/index.umd.js",
@@ -13,7 +13,9 @@
 		"test": "jest",
 		"format": "prettier --write 'src/**/*.ts'",
 		"format:check": "prettier --check 'src/**/*.ts'",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"docs": "typedoc",
+		"docs:watch": "typedoc --watch"
 	},
 	"repository": {
 		"type": "git",
@@ -36,6 +38,7 @@
 		"rollup-plugin-terser": "^7.0.2",
 		"rollup-plugin-typescript2": "^0.31.2",
 		"ts-jest": "^28.0.2",
+		"typedoc": "^0.22.15",
 		"typescript": "^4.6.4"
 	}
 }
