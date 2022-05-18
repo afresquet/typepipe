@@ -122,7 +122,7 @@ asyncPipeline.run(5, context, global); // Promise => ["6"]
 
 ## Steps
 
-There are methods for all the [steps](../../steps)
+There are methods for all the [steps](../../steps) available, their implementation is exactly the same, and the function that the steps would return is added to the pipeline.
 
 ```ts
 const pipeline = new Pipeline()
