@@ -122,7 +122,7 @@ asyncPipeline.run(5, context, global); // Promise => ["6"]
 
 ## Steps
 
-There are methods for all the [steps](../../steps/README.md#steps) available, their implementation is exactly the same, and the function that the steps would return is added to the pipeline.
+There are methods for all the [steps](../../steps)
 
 ```ts
 const pipeline = new Pipeline()
@@ -152,20 +152,20 @@ const pipeline = new Pipeline()
 
 ### assert
 
-See [assert](../../steps/README.md#assert).
+See [assert](../../steps)
 
 ### ifelse
 
-See [ifelse](../../steps/README.md#ifelse).
+See [ifelse](../../steps)
 
 ### match
 
-See [match](../../steps/README.md#match).
+See [match](../../steps)
 
 ### pairwise
 
-See [pairwise](../../steps/README.md#pairwise).
+See [pairwise](../../steps)
 
 ### tap
 
-See [tap](../../steps/README.md#tap).
+See [tap](../../steps)
