@@ -1,4 +1,5 @@
 # Examples
 
-- [Express.js](./express/README.md#expressjs-example)
-- [tmi.js](./tmi.js/README.md#tmijs-example)
+- [Express.js](./express)
+- [Discord.js](./discord.js)
+- [tmi.js](./tmi.js)
