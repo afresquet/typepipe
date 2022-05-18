@@ -1,0 +1,14 @@
+{
+	"name": "typepipe-example-javascript",
+	"main": "src/index.js",
+	"scripts": {
+		"start": "node src/index.js",
+		"dev": "nodemon src/index.js"
+	},
+	"dependencies": {
+		"typepipe": "file:../../"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.16"
+	}
+}

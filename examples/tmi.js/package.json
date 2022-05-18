@@ -1,0 +1,23 @@
+{
+	"name": "typepipe-example-tmi.js",
+	"main": "dist/index.js",
+	"scripts": {
+		"start": "node dist/index.js",
+		"prebuild": "npm run clean",
+		"build": "tsc",
+		"predev": "npm run clean",
+		"dev": "tsc-watch --onSuccess \"npm start\"",
+		"clean": "rimraf dist"
+	},
+	"dependencies": {
+		"dotenv": "^16.0.1",
+		"tmi.js": "^1.8.5",
+		"typepipe": "file:../../"
+	},
+	"devDependencies": {
+		"@types/tmi.js": "^1.8.1",
+		"rimraf": "^3.0.2",
+		"tsc-watch": "^5.0.3",
+		"typecript": "^0.0.1-security"
+	}
+}
