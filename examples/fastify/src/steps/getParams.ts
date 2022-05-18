@@ -5,11 +5,11 @@ const createParamGetter =
 	<Input, U extends string[]>(
 		...keys: U
 	): RouteFunction<
-		Input,
-		{ [K in typeof keys[number]]: string } | null,
 		X extends "body" ? { [K in typeof keys[number]]: string } : {},
 		X extends "params" ? { [K in typeof keys[number]]: string } : {},
-		X extends "query" ? { [K in typeof keys[number]]: string } : {}
+		X extends "query" ? { [K in typeof keys[number]]: string } : {},
+		Input,
+		{ [K in typeof keys[number]]: string } | null
 	> =>
 	(_, { req }) => {
 		const data: { [K in X]?: string } = {};

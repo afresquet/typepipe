@@ -216,7 +216,6 @@ export default class Pipeline<
 			this.errorHandler = undefined;
 
 			const onError = (error: unknown) => {
-				console.log(this.errorHandler);
 				if (!this.errorHandler) {
 					throw error;
 				}

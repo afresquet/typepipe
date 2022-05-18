@@ -1,6 +1,6 @@
 import { User } from "../../db/User";
 import { findUser } from "../../steps/findUser";
-import { respond } from "../../steps/json";
+import { respond } from "../../steps/respond";
 import { Route } from "../../types/Route";
 import RoutePipeline, { RouteFunction } from "../../types/RoutePipeline";
 import { RouteErrors } from "../../utils/RouteErrors";
@@ -8,7 +8,7 @@ import { RouteErrors } from "../../utils/RouteErrors";
 type Body = Partial<Omit<User, "id">>;
 type Params = { id: string };
 
-const updateUser: RouteFunction<User, Promise<User | null>, Body> = (
+const updateUser: RouteFunction<Body, {}, {}, User, Promise<User | null>> = (
 	user,
 	{ req },
 	{ UserModel }

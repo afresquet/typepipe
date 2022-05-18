@@ -1,6 +1,6 @@
 export class RouteErrors {
 	static Exit = class Exit extends Error {
-		constructor() {
+		constructor(public response?: any) {
 			super("Exit");
 		}
 	};

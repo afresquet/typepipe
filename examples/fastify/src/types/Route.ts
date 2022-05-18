@@ -6,10 +6,10 @@ export interface Route<Body = {}, Params = {}, Query = {}> {
 	path: string;
 	options?: RouteShorthandOptions;
 	execute: RouteFunction<
-		FastifyRequest<{ Body: Body; Params: Params; Query: Query }>,
-		void | Promise<void>,
 		Body,
 		Params,
-		Query
+		Query,
+		FastifyRequest<{ Body: Body; Params: Params; Querystring: Query }>,
+		void | Promise<void>
 	>;
 }

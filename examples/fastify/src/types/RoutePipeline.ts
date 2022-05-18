@@ -16,17 +16,17 @@ export default class RoutePipeline<
 	Params = {},
 	Query = {}
 > extends Pipeline<
-	FastifyRequest,
+	FastifyRequest<{ Body: Body; Params: Params; Querystring: Query }>,
 	RouteContext<Body, Params, Query>,
 	RouteGlobal
 > {}
 
 export interface RouteFunction<
-	Input = FastifyRequest,
-	Output = void | Promise<void>,
 	Body = {},
 	Params = {},
-	Query = {}
+	Query = {},
+	Input = FastifyRequest<{ Body: Body; Params: Params; Querystring: Query }>,
+	Output = void | Promise<void>
 > extends TypePipe.Function<
 		Input,
 		Output,

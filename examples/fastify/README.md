@@ -1,4 +1,4 @@
-# Express.js Example
+# Fastify Example
 
 ## Usage
 
@@ -9,7 +9,7 @@ npm install
 
 npm run build
 
-cd examples/express
+cd examples/fastify
 
 npm install
 

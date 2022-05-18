@@ -7,7 +7,7 @@ import { respond } from "./respond";
 
 type Params = { id: string };
 
-const readUser: RouteFunction<Params, Promise<User | undefined>> = (
+const readUser: RouteFunction<{}, {}, {}, Params, Promise<User | undefined>> = (
 	data,
 	_,
 	{ UserModel }
@@ -16,10 +16,11 @@ const readUser: RouteFunction<Params, Promise<User | undefined>> = (
 };
 
 export const findUser: RouteFunction<
-	FastifyRequest<{ Params: Params }>,
-	Promise<User>,
 	{},
-	Params
+	Params,
+	{},
+	FastifyRequest<{ Params: Params; Body: {}; Querystring: {} }>,
+	Promise<User>
 > = new RoutePipeline<{}, Params>()
 	.catch(respond(400))
 	.pipe(getParams("id"))

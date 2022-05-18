@@ -12,7 +12,11 @@ for (const route of routes) {
 
 			return response;
 		} catch (error) {
-			if (error instanceof RouteErrors.Exit) return;
+			if (error instanceof RouteErrors.Exit) {
+				return error.response;
+			}
+
+			throw error;
 		}
 	});
 }
