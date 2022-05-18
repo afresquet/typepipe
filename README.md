@@ -93,7 +93,7 @@ This is useful in anything that gets executed multiple times with different inpu
 
 This library was created with type checking as the first priority.
 
-While you can still use it in JavaScript just fine, you will find that it is so much more powerful in TypeScript.
+It works best with TypeScript, but [you can still use it in JavaScript with JSDoc (click to see how)](./examples/javascript/).
 
 You should only need to fill in the generics of `Pipeline` when instanciating it. Then everything will get inferred automatically, step by step, no matter how many funtions you pipe in.
 

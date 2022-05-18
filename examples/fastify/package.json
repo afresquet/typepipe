@@ -1,5 +1,5 @@
 {
-	"name": "typepipe-fastify-express",
+	"name": "typepipe-example-fastify",
 	"main": "dist/index.js",
 	"scripts": {
 		"start": "node dist/index.js",
