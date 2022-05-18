@@ -34,9 +34,9 @@ fn(1, { foo: "bar" }, "global"); // TypeError
 
 ## TypePipe.MatchFunction
 
-Function that receives a callback that takes a [Match](../../classes/Match/README.md#match) as the argument and sets its conditions.
+Function that receives a callback that takes a [Match](../../classes/Match)
 
-[Match](../../classes/Match/README.md#match) will receive Value, Context and Global, and should return Result.
+[Match](../../classes/Match)
 
 ```ts
 import { TypePipe } from "typepipe";

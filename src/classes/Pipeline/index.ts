@@ -53,6 +53,8 @@ export default class Pipeline<
 		>;
 	}
 
+	private currentContext: any;
+
 	/**
 	 * Changes the context passed to the following functions of the pipeline.
 	 *
@@ -176,42 +178,51 @@ export default class Pipeline<
 		Global
 	> {
 		const composition = this.functions.reduce(
-			(fn1, fn2) => (value, context, global) => {
-				const res = fn1(value, context, global);
+			(fn1, fn2) => (value, _, global) => {
+				const handleResult = (res: any) => {
+					if (res instanceof ChangeContext) {
+						const ctx = res.run();
 
-				if (res instanceof ChangeContext) {
-					const ctx = res.run();
+						if (isPromise(ctx)) {
+							return ctx.then(c => {
+								this.currentContext = c;
 
-					if (isPromise(ctx)) {
-						return ctx.then(c => {
-							return fn2(res.value, c as any, global);
-						});
+								return fn2(res.value, c, global);
+							});
+						}
+
+						this.currentContext = ctx;
+
+						return fn2(res.value, ctx, global);
 					}
 
-					return fn2(res.value, ctx, global);
+					if (res instanceof ErrorHandler) {
+						const errorHandler = res.run();
+
+						this.errorHandler = errorHandler;
+
+						return fn2(res.value, this.currentContext, global);
+					}
+
+					return fn2(res, this.currentContext, global);
+				};
+
+				const result = fn1(value, this.currentContext, global);
+
+				if (isPromise(result)) {
+					return result.then(handleResult);
 				}
 
-				if (res instanceof ErrorHandler) {
-					const errorHandler = res.run();
-
-					this.errorHandler = errorHandler;
-
-					return fn2(res.value, context, global);
-				}
-
-				if (isPromise(res)) {
-					return res.then(r => {
-						return fn2(r, context, global);
-					});
-				}
-
-				return fn2(res, context, global);
+				return handleResult(result);
 			}
 		);
 
 		return (value, context, global) => {
 			// Reset the error handler
 			this.errorHandler = undefined;
+
+			// Set the context
+			this.currentContext = context;
 
 			const onError = (error: unknown) => {
 				if (!this.errorHandler) {
