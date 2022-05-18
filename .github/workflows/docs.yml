@@ -1,7 +1,7 @@
 name: Deploy Docs
 
 on:
-  push:
+  release:
     branches:
       - master
 

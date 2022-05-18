@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI
 
 on:
   push:
@@ -22,6 +22,9 @@ jobs:
 
       - name: Tests
         run: npm test
+
+      - name: Build
+        run: npm run build
 
   cd:
     runs-on: ubuntu-20.04
