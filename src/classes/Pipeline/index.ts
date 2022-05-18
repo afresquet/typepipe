@@ -177,35 +177,37 @@ export default class Pipeline<
 	> {
 		const composition = this.functions.reduce(
 			(fn1, fn2) => (value, context, global) => {
-				const res = fn1(value, context, global);
+				const handleResult = (res: any) => {
+					if (res instanceof ChangeContext) {
+						const context = res.run();
 
-				if (res instanceof ChangeContext) {
-					const ctx = res.run();
+						if (isPromise(context)) {
+							return context.then(c => {
+								return fn2(res.value, c as any, global);
+							});
+						}
 
-					if (isPromise(ctx)) {
-						return ctx.then(c => {
-							return fn2(res.value, c as any, global);
-						});
+						return fn2(res.value, context, global);
 					}
 
-					return fn2(res.value, ctx, global);
+					if (res instanceof ErrorHandler) {
+						const errorHandler = res.run();
+
+						this.errorHandler = errorHandler;
+
+						return fn2(res.value, context, global);
+					}
+
+					return fn2(res, context, global);
+				};
+
+				const result = fn1(value, context, global);
+
+				if (isPromise(result)) {
+					return result.then(handleResult);
 				}
 
-				if (res instanceof ErrorHandler) {
-					const errorHandler = res.run();
-
-					this.errorHandler = errorHandler;
-
-					return fn2(res.value, context, global);
-				}
-
-				if (isPromise(res)) {
-					return res.then(r => {
-						return fn2(r, context, global);
-					});
-				}
-
-				return fn2(res, context, global);
+				return handleResult(result);
 			}
 		);
 
@@ -214,6 +216,7 @@ export default class Pipeline<
 			this.errorHandler = undefined;
 
 			const onError = (error: unknown) => {
+				console.log(this.errorHandler);
 				if (!this.errorHandler) {
 					throw error;
 				}
