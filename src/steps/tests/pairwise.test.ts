@@ -1,26 +1,24 @@
-import type { Context, Global, TestFn } from "../../types/tests";
+import { context, global, TestFn, value } from "../../utils/tests";
 import { pairwise } from "../pairwise";
 
 describe("pairwise step", () => {
-	const value = 10;
-	const context: Context = { foo: "bar" };
-	const global: Global = { bar: "foo" };
+	const expected = [value, 20];
 
 	test("returns both the previous and new value", () => {
 		const fn: TestFn<number, number> = jest.fn(x => x * 2);
 
-		const result = pairwise(fn)(value, context, global);
+		const actual = pairwise(fn)(value, context, global);
 
-		expect(result).toStrictEqual([value, 20]);
+		expect(actual).toStrictEqual(expected);
 		expect(fn).toHaveBeenCalledWith(value, context, global);
 	});
 
-	test("works with promises", () => {
+	test("returns both the previous and new value (async)", () => {
 		const fn: TestFn<number, Promise<number>> = jest.fn(async x => x * 2);
 
-		const result = pairwise(fn)(value, context, global);
+		const actual = pairwise(fn)(value, context, global);
 
-		expect(result).resolves.toStrictEqual([value, 20]);
+		expect(actual).resolves.toStrictEqual(expected);
 		expect(fn).toHaveBeenCalledWith(value, context, global);
 	});
 });

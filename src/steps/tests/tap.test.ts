@@ -1,27 +1,24 @@
-import type { Context, Global, TestFn } from "../../types/tests";
+import { context, global, TestFn, value } from "../../utils/tests";
 import { tap } from "../tap";
 
 describe("tap step", () => {
-	const value = 10;
-	const context: Context = { foo: "bar" };
-	const global: Global = { bar: "foo" };
-
-	test("return the same value", () => {
+	test("returns the same value", () => {
 		const fn: TestFn<number, void> = jest.fn();
 
-		const result = tap(fn)(value, context, global);
+		const actual = tap(fn)(value, context, global);
 
-		expect(result).toBe(value);
+		expect(actual).toBe(value);
 		expect(fn).toHaveBeenCalledWith(value, context, global);
 		expect(fn).not.toHaveReturnedWith(value);
 	});
 
-	test("work with promises", () => {
+	test("returns the same value (async)", () => {
 		const fn: TestFn<number, Promise<void>> = jest.fn(async () => {});
 
-		const result = tap(fn)(value, context, global);
+		const actual = tap(fn)(value, context, global);
 
-		expect(result).resolves.toBe(value);
+		expect(actual).resolves.toBe(value);
 		expect(fn).toHaveBeenCalledWith(value, context, global);
+		expect(fn).not.toHaveReturnedWith(value);
 	});
 });
