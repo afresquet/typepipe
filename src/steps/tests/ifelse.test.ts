@@ -1,67 +1,67 @@
-import type { Context, Global, TestFn } from "../../types/tests";
+import { context, global, TestFn, value } from "../../utils/tests";
 import { ifelse } from "../ifelse";
 
 describe("ifelse step", () => {
-	const value = 10;
-	const context: Context = { foo: "bar" };
-	const global: Global = { bar: "foo" };
-
 	const then: TestFn<number, number> = jest.fn(x => x * 2);
 	const otherwise: TestFn<number, number> = jest.fn(x => x / 2);
 
 	beforeEach(jest.clearAllMocks);
 
-	test("calls the first function if the condition is true", () => {
+	test("calls the 'then' function if the condition is true", () => {
 		const condition: TestFn<number, boolean> = jest.fn(x => x > 5);
 
-		const result = ifelse(condition, then, otherwise)(value, context, global);
+		const actual = ifelse(condition, then, otherwise)(value, context, global);
+		const expected = 20;
 
-		expect(result).toBe(20);
+		expect(actual).toBe(expected);
 		expect(condition).toHaveBeenCalledWith(value, context, global);
 		expect(then).toHaveBeenCalledWith(value, context, global);
 		expect(otherwise).not.toHaveBeenCalled();
 	});
 
-	test("calls the second function if the condition is false", () => {
+	test("calls the 'otherwise' function if the condition is false", () => {
 		const condition: TestFn<number, boolean> = jest.fn(x => x < 5);
 
-		const result = ifelse(condition, then, otherwise)(value, context, global);
+		const actual = ifelse(condition, then, otherwise)(value, context, global);
+		const expected = 5;
 
-		expect(result).toBe(5);
+		expect(actual).toBe(expected);
 		expect(condition).toHaveBeenCalledWith(value, context, global);
 		expect(then).not.toHaveBeenCalled();
 		expect(otherwise).toHaveBeenCalledWith(value, context, global);
 	});
 
-	test("works with promises for true condition", async () => {
+	test("calls the 'then' function if the condition is true (async)", async () => {
 		const condition: TestFn<number, Promise<boolean>> = jest.fn(
 			async x => x > 5
 		);
 
-		const result = await ifelse(condition, then, otherwise)(
+		const actual = await ifelse(condition, then, otherwise)(
 			value,
 			context,
 			global
 		);
+		const expected = 20;
 
-		expect(result).toBe(20);
+		expect(actual).toBe(expected);
 		expect(condition).toHaveBeenCalledWith(value, context, global);
 		expect(then).toHaveBeenCalledWith(value, context, global);
 		expect(otherwise).not.toHaveBeenCalled();
 	});
 
-	test("works with promises for false condition", async () => {
+	test("calls the 'otherwise' function if the condition is false (async)", async () => {
 		const condition: TestFn<number, Promise<boolean>> = jest.fn(
 			async x => x < 5
 		);
 
-		const result = await ifelse(condition, then, otherwise)(
+		const actual = await ifelse(condition, then, otherwise)(
 			value,
 			context,
 			global
 		);
+		const expected = 5;
 
-		expect(result).toBe(5);
+		expect(actual).toBe(expected);
 		expect(condition).toHaveBeenCalledWith(value, context, global);
 		expect(then).not.toHaveBeenCalled();
 		expect(otherwise).toHaveBeenCalledWith(value, context, global);

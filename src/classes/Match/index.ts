@@ -18,21 +18,14 @@ export default class Match<
 	Async = false
 > {
 	private matchers: {
-		matcher: TypePipe.Function<Value, boolean, Context, Global>;
-		pipeline: TypePipe.Function<
+		condition: TypePipe.Function<Value, boolean, Context, Global>;
+		fn: TypePipe.Function<
 			Value,
 			ExtendsNever<Result, any, Result | Promise<Result>>,
 			Context,
 			Global
 		>;
 	}[] = [];
-
-	private otherwisePipeline?: TypePipe.Function<
-		Value,
-		ExtendsNever<Result, any, Result | Promise<Result>>,
-		Context,
-		Global
-	>;
 
 	/**
 	 * Adds a condition and a callback that will be run if the condition matches.
@@ -51,10 +44,10 @@ export default class Match<
 	 * ```
 	 */
 	on<Next extends ExtendsNever<Result, any, Result | Promise<Result>>>(
-		matcher: TypePipe.Function<Value, boolean, Context, Global>,
-		pipeline: TypePipe.Function<Value, Next, Context, Global>
+		condition: TypePipe.Function<Value, boolean, Context, Global>,
+		fn: TypePipe.Function<Value, Next, Context, Global>
 	) {
-		this.matchers.push({ matcher, pipeline });
+		this.matchers.push({ condition, fn });
 
 		return this as unknown as Match<
 			Value,
@@ -64,6 +57,13 @@ export default class Match<
 			Persist<Async, IsPromise<Next>>
 		>;
 	}
+
+	private otherwiseFn?: TypePipe.Function<
+		Value,
+		ExtendsNever<Result, any, Result | Promise<Result>>,
+		Context,
+		Global
+	>;
 
 	/**
 	 * Adds a callback that will be called if no conditions match.
@@ -79,9 +79,9 @@ export default class Match<
 	 * ```
 	 */
 	otherwise<Next extends ExtendsNever<Result, any, Result | Promise<Result>>>(
-		pipeline: TypePipe.Function<Value, Next, Context, Global>
+		fn: TypePipe.Function<Value, Next, Context, Global>
 	) {
-		this.otherwisePipeline = pipeline;
+		this.otherwiseFn = fn;
 
 		return this as unknown as Match<
 			Value,
@@ -93,7 +93,7 @@ export default class Match<
 	}
 
 	/**
-	 * Creates a pipeline function that will run all the conditions with the given values
+	 * Creates a function that will run all the conditions with the given values
 	 * and will return the result of the called callback.
 	 *
 	 * If any of the conditions or callbacks returns a `Promise`,
@@ -136,28 +136,25 @@ export default class Match<
 	 */
 	compose() {
 		return ((value, context, global) => {
-			for (const { matcher, pipeline } of this.matchers) {
-				const condition = matcher(value, context, global);
+			for (const { condition, fn } of this.matchers) {
+				const shouldRun = condition(value, context, global);
 
-				if (isPromise(condition)) {
+				if (isPromise(shouldRun)) {
 					throw new Error("Condition can't be a promise");
 				}
 
-				if (condition) {
-					return pipeline(value, context, global) as IsAsync<Result, Async>;
+				if (shouldRun) {
+					return fn(value, context, global) as IsAsync<Result, Async>;
 				}
 			}
 
-			if (!this.otherwisePipeline) {
+			if (!this.otherwiseFn) {
 				throw new Error(
-					"Condition didn't match and no 'otherwise' pipeline was provided"
+					"Condition didn't match and no 'otherwise' function was provided"
 				);
 			}
 
-			return this.otherwisePipeline(value, context, global) as IsAsync<
-				Result,
-				Async
-			>;
+			return this.otherwiseFn(value, context, global) as IsAsync<Result, Async>;
 		}) as TypePipe.Function<
 			Value,
 			IsAsync<Result, Async, true>,

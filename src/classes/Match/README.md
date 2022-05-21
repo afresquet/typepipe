@@ -40,7 +40,7 @@ const match = new Match()
 
 ### compose
 
-Creates a pipeline function that will run all the conditions with the given values and will return the result of the called callback.
+Creates a function that will run all the conditions with the given values and will return the result of the called callback.
 
 If any of the conditions or callbacks returns a `Promise`, the returned value will be wrapped in a `Promise`.
 
@@ -80,7 +80,7 @@ asyncFn(5, context, global); // Promise => 0
 
 ### run
 
-The exact same as [Match.compose](#compose), but calls the pipeline function instead of returning it.
+The exact same as [Match.compose](#compose), but calls the composed function instead of returning it.
 
 ```ts
 const match = new Match()

@@ -19,8 +19,8 @@ describe("match step", () => {
 	});
 
 	test("returns a pipeline function that executes the Match configured with the given function", () => {
-		const result = match(matchFn)(10, { foo: "bar" }, { bar: "foo" });
+		const actual = match(matchFn)(10, { foo: "bar" }, { bar: "foo" });
 
-		expect(result).toBe(true);
+		expect(actual).toBe(true);
 	});
 });
