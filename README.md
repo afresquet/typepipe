@@ -163,3 +163,7 @@ You can find some examples in the [examples](./examples)
 4. Commit your changes: `git commit -am "Add some feature"`
 5. Push to the branch: `git push origin my-new-feature`
 6. Open a pull request :D
+
+## Credits
+
+This library was inspired on [bauta.js](https://github.com/axa-group/bauta.js) from my time working at Axa.
