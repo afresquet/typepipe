@@ -37,7 +37,7 @@ const { Pipeline } = require("typepipe");
 const pipeline = new Pipeline()
 	.pipe((value, context, global) => global.effect(value, context.foo))
 	.pipe((value, context, global) => value.toString())
-	.pipe((value, context, global) => string.padStart(2, "0"));
+	.pipe((value, context, global) => value.padStart(2, "0"));
 
 pipeline.run(1, { foo: 2 }, { effect: (a, b) => a + b }); // "03"
 
@@ -62,7 +62,7 @@ interface Global {
 const pipeline = new Pipeline<number, Context, Global>()
 	.pipe((value, { foo }, { effect }) => effect(value, foo))
 	.pipe((value, context, global) => value.toString())
-	.pipe((value, context, global) => string.padStart(2, "0")); // TypeScript knows `value` is a string now
+	.pipe((value, context, global) => value.padStart(2, "0")); // TypeScript knows `value` is a string now
 
 pipeline.run(1, { foo: 2 }, { effect: (a, b) => a + b }); // "03"
 pipeline.run("1", { foo: 2 }, { effect: (a, b) => a + b }); // Type Error: value should be a number
@@ -81,7 +81,7 @@ As you can see in the examples above, the functions have two other parameters: `
 
 You can use them for anything you want really, but the idea is that `context` is something (often an object) containing relevant values for the current execution, and `global` has constant values that are shared between all executions.
 
-For example, you could use this on an [Express.js](https://github.com/expressjs/express) server (or any other server library/framework), and have the `context` be the current `req` and `res` objects, and `global` could be database models and/or libraries.
+For example, you could use this on an [Express.js](https://github.com/expressjs/express) server (or any other server library/framework), and have the `context` be the current `req` and `res` objects, and `global` could be database connections and/or libraries.
 
 This makes unit testing really easy, as you can mock both those contexts very easily.
 
@@ -95,7 +95,7 @@ This library was created with type checking as the first priority.
 
 It works best with TypeScript, but [you can still use it in JavaScript with JSDoc (click to see how)](./examples/javascript/).
 
-You should only need to fill in the generics of `Pipeline` when instanciating it. Then everything will get inferred automatically, step by step, no matter how many funtions you pipe in.
+You should only need to fill in the generics of `Pipeline` when instanciating it. Then everything will get inferred automatically, step by step, no matter how many functions you pipe in.
 
 But if you want to extract the functions you pass to your pipelines (and you should in order to unit test them), you can give them a type `TypePipe.Function` and pass your generics to the type like this:
 
